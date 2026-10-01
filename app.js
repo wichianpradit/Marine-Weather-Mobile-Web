@@ -119,3 +119,34 @@ function drawTide(levels,curr,waves,nowIndex){
 const _loadV3=load;load=async function(){await _loadV3();loadTide()};
 window.addEventListener('resize',()=>{if(document.getElementById('sea')?.classList.contains('active'))loadTide()});
 loadTide();
+
+// V4.2 — interactive SEA chart: tap/drag to inspect every hour
+let SEA24=null,SEA_SELECTED=null;
+function seaArrow(deg){deg=Number(deg);if(!Number.isFinite(deg))return '•';const a=['↑','↗','→','↘','↓','↙','←','↖'];return a[Math.round((((deg%360)+360)%360)/45)%8]}
+function renderSeaSelection(i,scroll=false){
+ if(!SEA24)return;i=Math.max(0,Math.min(SEA24.times.length-1,i));SEA_SELECTED=i;
+ const d=SEA24,level=d.levels[i],cv=d.curr[i],cd=d.cdir[i],wv=d.waves[i],wp=d.periods[i],wd=d.wdirs[i];
+ $('tideNow').textContent=val(level,' m',2);$('currentNow').textContent=val(cv,' kt',2);$('currentDirNow').textContent=`${seaArrow(cd)} ${dir(cd)} • TO`;
+ if($('seaWaveNow')){$('seaWaveNow').textContent=val(wv,' m',1);$('seaWaveDir').textContent=`${seaArrow(wd)} ${dir(wd)} • FROM`}
+ const prev=i>0?d.levels[i-1]:d.levels[i],delta=Number(level)-Number(prev);$('tideTrend').textContent=Math.abs(delta)<.01?'≈ NEAR SLACK LEVEL':delta>0?'↗ RISING':'↘ FALLING';
+ document.querySelectorAll('.seaHour').forEach((el,n)=>el.classList.toggle('selected',n===i));
+ if(scroll){const el=document.querySelector(`.seaHour[data-hour="${i}"]`);el?.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'})}
+ document.querySelectorAll('.seaMetric').forEach(el=>{el.classList.remove('selectedPulse');void el.offsetWidth;el.classList.add('selectedPulse')});
+ drawTide(d.levels,d.curr,d.waves,d.nowIndex,i);
+}
+function buildSeaHours(d){
+ $('seaHourly').innerHTML=d.times.map((t,i)=>`<div class="seaHour ${i===d.nowIndex?'now':''}" data-hour="${i}"><b>${t.slice(11,16)}</b><span>น้ำ ${val(d.levels[i],' m',2)}</span><strong>กระแส ${val(d.curr[i],' kt',1)}</strong><small>${seaArrow(d.cdir[i])} ${dir(d.cdir[i])} • TO</small><span>คลื่น ${val(d.waves[i],' m',1)}</span><small>${val(d.periods[i],' s',1)} • ${seaArrow(d.wdirs[i])} ${dir(d.wdirs[i])}</small></div>`).join('');
+ document.querySelectorAll('.seaHour').forEach(el=>el.addEventListener('click',()=>renderSeaSelection(Number(el.dataset.hour))));
+}
+function bindSeaCanvas(){const c=$('tideCanvas');if(!c||c.dataset.interactive)return;c.dataset.interactive='1';let down=false;const pick=e=>{if(!SEA24)return;const r=c.getBoundingClientRect(),clientX=e.touches?e.touches[0].clientX:e.clientX,padL=34,padR=10,x=Math.max(padL,Math.min(r.width-padR,clientX-r.left)),ratio=(x-padL)/(r.width-padL-padR),i=Math.round(ratio*(SEA24.times.length-1));renderSeaSelection(i,true)};c.addEventListener('pointerdown',e=>{down=true;c.setPointerCapture?.(e.pointerId);pick(e)});c.addEventListener('pointermove',e=>{if(down)pick(e)});c.addEventListener('pointerup',()=>down=false);c.addEventListener('pointercancel',()=>down=false)}
+const _renderTideV41=renderTide;
+renderTide=function(h){
+ _renderTideV41(h);
+ const now=new Date(),today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).format(now),idx=[];h.time.forEach((t,i)=>{if(t.slice(0,10)===today)idx.push(i)});if(!idx.length)return;
+ const hh=Number(new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Bangkok',hour:'2-digit',hour12:false}).format(now))%24;
+ SEA24={times:idx.map(i=>h.time[i]),levels:idx.map(i=>h.sea_level_height_msl[i]),curr:idx.map(i=>h.ocean_current_velocity[i]),cdir:idx.map(i=>h.ocean_current_direction[i]),waves:idx.map(i=>h.wave_height?.[i]),periods:idx.map(i=>h.wave_period?.[i]),wdirs:idx.map(i=>h.wave_direction?.[i]),nowIndex:Math.min(hh,idx.length-1)};
+ buildSeaHours(SEA24);bindSeaCanvas();renderSeaSelection(SEA_SELECTED??SEA24.nowIndex,true);
+};
+// Extend draw function with a selected-hour marker while preserving NOW marker
+const _drawTideV41=drawTide;
+drawTide=function(levels,curr,waves,nowIndex,selectedIndex){_drawTideV41(levels,curr,waves,nowIndex);if(selectedIndex==null)return;const c=$('tideCanvas'),dpr=window.devicePixelRatio||1,w=c.clientWidth||330,h=c.clientHeight||230,x=c.getContext('2d');x.save();x.scale(dpr,dpr);const padL=34,padR=10,padT=16,padB=32,pw=w-padL-padR,ph=h-padT-padB,X=padL+(selectedIndex/(levels.length-1))*pw;x.beginPath();x.moveTo(X,padT);x.lineTo(X,padT+ph);x.strokeStyle='#24d4ff';x.lineWidth=2;x.stroke();x.beginPath();x.arc(X,padT+ph,5,0,Math.PI*2);x.fillStyle='#24d4ff';x.fill();x.font='bold 10px system-ui';x.fillStyle='#24d4ff';x.fillText(String(selectedIndex).padStart(2,'0')+':00',Math.max(2,Math.min(w-40,X-16)),padT+12);x.restore()};
