@@ -50,19 +50,28 @@
 </section>
 
 
-<section id="tide" class="page">
- <div class="sectionTitle"><span class="bigIcon">≈</span><div><h2>TIDE & CURRENT</h2><small>24-hour sea level + ocean current</small></div></div>
- <div class="tideHero"><div class="tideStat"><small>SEA LEVEL NOW</small><strong id="tideNow">--</strong><span id="tideTrend">--</span></div><div class="tideStat"><small>CURRENT NOW</small><strong id="currentNow">--</strong><span id="currentDirNow">--</span></div></div>
- <div class="chartBox"><div class="chartTitle"><b>24 HOURS</b><small id="tideDate">--</small></div><canvas id="tideCanvas"></canvas><div class="currentLegend"><span><i class="dot low"></i>เบา &lt;0.5 kt</span><span><i class="dot mid"></i>ปานกลาง 0.5–1.0</span><span><i class="dot strong"></i>แรง 1.0–1.5</span><span><i class="dot vstrong"></i>แรงมาก ≥1.5</span></div></div>
- <h3><span>HIGH / LOW • MODEL</span><small>local extrema</small></h3><div id="tideExtremes" class="extremes"></div>
- <h3><span>CURRENT • HOURLY</span><small>kt • direction TO</small></h3><div id="currentHours" class="hourStrip"></div>
- <div class="notice tideWarn">ระดับน้ำและกระแสน้ำเป็นข้อมูลแบบจำลอง Marine ความละเอียดประมาณ 8 กม. ค่า HIGH/LOW ด้านบนหา local extrema จากแบบจำลอง ไม่ใช่ตารางน้ำทางการ และไม่ควรใช้แทนข้อมูลเพื่อการเดินเรือชายฝั่ง</div>
-</section>
-
-<section id="sea" class="page">
- <div class="sectionTitle"><span class="bigIcon">≋</span><div><h2>SEA / WAVE</h2><small>Marine conditions</small></div></div>
- <div id="seaFull" class="cards"></div>
- <div class="notice">ข้อมูลคลื่น กระแสน้ำ และอุณหภูมิผิวน้ำเป็นข้อมูลแบบจำลอง Marine ไม่ควรใช้แทนประกาศเพื่อการเดินเรืออย่างเป็นทางการ</div>
+<section id="sea" class="page seaPage">
+ <div class="seaSubnav">
+  <button class="on">≋ น้ำขึ้น น้ำลง</button><button>↝ กระแสน้ำ</button><button>🌊 คลื่น</button><button>➤ ลม & คลื่นรวม</button>
+ </div>
+ <div class="seaTopGrid">
+  <div class="seaMetric"><span>🌊</span><small>ระดับน้ำ (ปัจจุบัน)</small><strong id="tideNow">--</strong><b id="tideTrend">--</b></div>
+  <div class="seaMetric"><span>↝</span><small>กระแสน้ำ (ปัจจุบัน)</small><strong id="currentNow">--</strong><b id="currentDirNow">--</b></div>
+  <div class="seaMetric"><span>≋</span><small>ความสูงคลื่น (ปัจจุบัน)</small><strong id="seaWaveNow">--</strong><b id="seaWaveDir">--</b></div>
+  <div class="seaMetric"><span>➤</span><small>ลม (ปัจจุบัน)</small><strong id="seaWindNow">--</strong><b id="seaWindDir">--</b></div>
+ </div>
+ <div class="seaChartPanel">
+  <div class="seaChartHead"><div><h2>กราฟทะเล 24 ชั่วโมง</h2><small id="tideDate">--</small></div><div class="seaLegend"><span class="blueDot">●</span> ระดับน้ำ (m) <span class="yellowDot">●</span> กระแสน้ำ (kt) <span class="purpleDot">●</span> คลื่น (m)</div></div>
+  <canvas id="tideCanvas"></canvas>
+  <div class="strengthDots" id="strengthDots"></div>
+  <div class="seaHourly" id="seaHourly"></div>
+ </div>
+ <div class="seaBottomGrid">
+  <div class="seaInfoBox"><h3>น้ำขึ้น-น้ำลง วันนี้</h3><div id="tideExtremes" class="extremes"></div></div>
+  <div class="seaInfoBox"><h3>ระดับความแรงกระแสน้ำ (kt)</h3><div class="strengthLegend"><span><i class="dot low"></i>อ่อน <b>0–0.5</b></span><span><i class="dot mid"></i>ปานกลาง <b>0.5–1.0</b></span><span><i class="dot strong"></i>แรง <b>1.0–1.5</b></span><span><i class="dot vstrong"></i>แรงมาก <b>≥1.5</b></span></div></div>
+  <div class="seaInfoBox noteBox"><h3>หมายเหตุ</h3><small>ข้อมูล Marine model • Tide / Current / Wave<br>ใช้เพื่อการวางแผน ไม่ใช่ข้อมูลเดินเรืออย่างเป็นทางการ</small></div>
+ </div>
+ <div id="seaFull" class="cards hiddenLegacy"></div><div id="currentHours" style="display:none"></div>
 </section>
 
 <section id="settings" class="page">
@@ -95,7 +104,6 @@
  <button class="on" data-page="home"><i>⌂</i><span>HOME</span></button>
  <button data-page="weather"><i>☁</i><span>WEATHER</span></button>
  <button data-page="days"><i>▦</i><span>7 DAYS</span></button>
- <button data-page="tide"><i>≈</i><span>TIDE</span></button>
  <button data-page="sea"><i>≋</i><span>SEA</span></button>
  <button data-page="settings"><i>⚙</i><span>SET</span></button>
 </nav>
