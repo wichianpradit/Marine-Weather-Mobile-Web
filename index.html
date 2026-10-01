@@ -1,10 +1,93 @@
-<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#03101d"><link rel="manifest" href="./manifest.webmanifest"><title>Marine Weather</title><link rel="stylesheet" href="./style.css"></head>
-<body><main class="app">
-<header><div><div class="logo">MARINE <i>WEATHER</i></div><small>by Tai Pond Pattani</small></div><div class="live"><b></b><span id="live">LIVE</span></div></header>
-<div class="where"><div>📍 <strong id="place">--</strong><small id="coords"></small></div><button id="reload">UPDATE</button></div>
-<section id="home" class="page active"><div class="hero"><div><span>WEATHER • TMD</span><strong id="temp">--</strong><small id="cond">Current forecast</small></div><div class="wave"><span>WAVE NOW</span><strong id="wave">--</strong><small id="wdir">--</small></div></div><div id="cards" class="cards"></div><h3>SEA CONDITION <small>Marine model</small></h3><div id="seaCards" class="cards"></div></section>
-<section id="weather" class="page"><h2>TMD WEATHER</h2><div id="weatherCards" class="cards"></div><h3>HOURLY STATUS</h3><div class="notice">ข้อมูลอากาศหน้านี้มาจาก TMD NWP โดยตรงผ่านเซิร์ฟเวอร์ของเว็บ</div></section>
-<section id="days" class="page"><div class="title"><h2>7 DAY FORECAST</h2><small>TMD + Marine</small></div><div class="switch"><button class="on" data-tab="wx">WEATHER</button><button data-tab="sea">SEA / WAVE</button></div><div id="dayList"></div></section>
-<section id="sea" class="page"><h2>SEA / WAVE</h2><div id="seaFull" class="cards"></div><div class="notice">คลื่น กระแสน้ำ และอุณหภูมิผิวน้ำเป็นข้อมูลแบบจำลอง Marine ไม่ใช่ TMD และไม่ควรใช้แทนข้อมูลเพื่อการเดินเรืออย่างเป็นทางการ</div></section>
-<section id="settings" class="page"><h2>LOCATION</h2><div class="form"><label>ชื่อพื้นที่<input id="name" value="Pattani Sea"></label><label>Latitude<input id="lat" type="number" step=".00001" value="6.8695"></label><label>Longitude<input id="lon" type="number" step=".00001" value="101.2505"></label><button id="save">SAVE & UPDATE</button></div><div class="notice">TMD PAT เก็บไว้ที่ไฟล์ <b>.env</b> ฝั่งเซิร์ฟเวอร์ ไม่ถูกส่งไปเก็บใน JavaScript ของมือถือ</div></section>
-</main><nav><button class="on" data-page="home">HOME</button><button data-page="weather">WEATHER</button><button data-page="days">7 DAYS</button><button data-page="sea">SEA</button><button data-page="settings">SET</button></nav><script src="./config.js"></script><script src="./app.js"></script></body></html>
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#03101d">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>Marine Weather • Tai Pond Pattani</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<main class="app">
+<header>
+  <div class="brand">
+    <div class="brandmark">⚓</div>
+    <div><div class="logo">MARINE <i>WEATHER</i></div><small>TAI POND PATTANI • SEA COMMAND</small></div>
+  </div>
+  <div class="live"><b></b><span id="live">LIVE</span></div>
+</header>
+
+<div class="where">
+ <div class="whereText"><span class="pin">⌖</span><div><strong id="place">--</strong><small id="coords">--</small></div></div>
+ <button id="reload" class="iconBtn">↻ <span>UPDATE</span></button>
+</div>
+
+<section id="home" class="page active">
+ <div class="hero">
+  <div class="weatherHero">
+   <div class="heroIcon">☀</div><span>WEATHER • TMD</span><strong id="temp">--</strong><small id="cond">Current forecast</small>
+  </div>
+  <div class="wave">
+   <div class="heroIcon waveIcon">≋</div><span>WAVE NOW</span><strong id="wave">--</strong><small id="wdir">--</small>
+  </div>
+ </div>
+ <div id="cards" class="cards"></div>
+ <h3><span>SEA CONDITION</span><small>Marine model</small></h3>
+ <div id="seaCards" class="cards"></div>
+</section>
+
+<section id="weather" class="page">
+ <div class="sectionTitle"><span class="bigIcon">☁</span><div><h2>TMD WEATHER</h2><small>Atmospheric conditions</small></div></div>
+ <div id="weatherCards" class="cards"></div>
+ <div class="notice">ข้อมูลอากาศมาจาก TMD NWP ผ่าน Backend เดิมของระบบ</div>
+</section>
+
+<section id="days" class="page">
+ <div class="title"><div><h2>7 DAY FORECAST</h2><small>TMD + Marine</small></div><span class="bigIcon">▦</span></div>
+ <div class="switch"><button class="on" data-tab="wx">☀ WEATHER</button><button data-tab="sea">≋ SEA / WAVE</button></div>
+ <div id="dayList"></div>
+</section>
+
+<section id="sea" class="page">
+ <div class="sectionTitle"><span class="bigIcon">≋</span><div><h2>SEA / WAVE</h2><small>Marine conditions</small></div></div>
+ <div id="seaFull" class="cards"></div>
+ <div class="notice">ข้อมูลคลื่น กระแสน้ำ และอุณหภูมิผิวน้ำเป็นข้อมูลแบบจำลอง Marine ไม่ควรใช้แทนประกาศเพื่อการเดินเรืออย่างเป็นทางการ</div>
+</section>
+
+<section id="settings" class="page">
+ <div class="sectionTitle"><span class="bigIcon">⌖</span><div><h2>LOCATION • DDM</h2><small>Degrees Decimal Minutes</small></div></div>
+ <div class="form">
+   <label>ชื่อพื้นที่<input id="name" value="Pattani Sea" autocomplete="off"></label>
+   <div class="coordLabel"><b>LATITUDE</b><small>ตัวอย่าง 06° 52.170′ N</small></div>
+   <div class="ddm">
+     <input id="latDeg" type="number" min="0" max="90" step="1" value="6"><span>°</span>
+     <input id="latMin" type="number" min="0" max="59.9999" step=".0001" value="52.1700"><span>′</span>
+     <select id="latHem"><option>N</option><option>S</option></select>
+   </div>
+   <div class="coordLabel"><b>LONGITUDE</b><small>ตัวอย่าง 101° 15.030′ E</small></div>
+   <div class="ddm">
+     <input id="lonDeg" type="number" min="0" max="180" step="1" value="101"><span>°</span>
+     <input id="lonMin" type="number" min="0" max="59.9999" step=".0001" value="15.0300"><span>′</span>
+     <select id="lonHem"><option>E</option><option>W</option></select>
+   </div>
+   <div id="ddmPreview" class="preview">--</div>
+   <div class="actionRow">
+     <button id="gps" class="secondary">⌖ USE GPS</button>
+     <button id="save">✓ SAVE & UPDATE</button>
+   </div>
+ </div>
+ <div class="notice">หน้าเว็บใช้ DDM สำหรับกรอกและแสดงพิกัด ส่วนระบบจะแปลงเป็น Decimal Degrees อัตโนมัติก่อนส่งไปยัง API/TMD</div>
+</section>
+</main>
+
+<nav>
+ <button class="on" data-page="home"><i>⌂</i><span>HOME</span></button>
+ <button data-page="weather"><i>☁</i><span>WEATHER</span></button>
+ <button data-page="days"><i>▦</i><span>7 DAYS</span></button>
+ <button data-page="sea"><i>≋</i><span>SEA</span></button>
+ <button data-page="settings"><i>⚙</i><span>SET</span></button>
+</nav>
+<div id="toast" class="toast"></div>
+<script src="./config.js"></script><script src="./app.js"></script>
+</body></html>
