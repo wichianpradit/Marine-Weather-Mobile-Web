@@ -81,3 +81,36 @@ $("gps").onclick=()=>{if(!navigator.geolocation){toast("อุปกรณ์น
 try{const x=JSON.parse(localStorage.getItem("mwloc2"));if(x){$("name").value=x.name||"Pattani Sea";setDDM(x.lat,x.lon)}else setDDM(6.8695,101.2505)}catch{setDDM(6.8695,101.2505)}
 preview();load();setInterval(load,10*60*1000);
 if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js");
+// V4 Tide & Current — Open-Meteo Marine model
+function currentClass(k){k=Number(k)||0;return k<.5?'low':k<1?'mid':k<1.5?'strong':'vstrong'}
+function localExtrema(levels,times){const a=[];for(let i=1;i<levels.length-1;i++){if(levels[i]==null)continue;const p=levels[i-1],x=levels[i],n=levels[i+1];if(p==null||n==null)continue;if(x>p&&x>=n)a.push({type:'▲ HIGH',time:times[i],v:x});if(x<p&&x<=n)a.push({type:'▼ LOW',time:times[i],v:x})}return a}
+async function loadTide(){
+ try{
+  const p=currentCoords();
+  const u=new URL('https://marine-api.open-meteo.com/v1/marine');
+  u.searchParams.set('latitude',p.lat);u.searchParams.set('longitude',p.lon);u.searchParams.set('timezone','Asia/Bangkok');u.searchParams.set('forecast_days','2');u.searchParams.set('cell_selection','sea');u.searchParams.set('length_unit','metric');u.searchParams.set('velocity_unit','kn');u.searchParams.set('hourly','sea_level_height_msl,ocean_current_velocity,ocean_current_direction');
+  const r=await fetch(u,{cache:'no-store'}),j=await r.json();if(!r.ok||!j.hourly)throw new Error(j.reason||'TIDE_API');
+  renderTide(j.hourly);
+ }catch(e){console.error(e);$('tideNow').textContent='--';$('currentNow').textContent='--';$('tideExtremes').innerHTML='<div class="notice">ยังรับข้อมูล Tide/Current ไม่ได้</div>'}
+}
+function renderTide(h){
+ const now=new Date(),today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).format(now),idx=[];
+ h.time.forEach((t,i)=>{if(t.slice(0,10)===today)idx.push(i)});if(!idx.length)return;
+ const times=idx.map(i=>h.time[i]),levels=idx.map(i=>h.sea_level_height_msl[i]),curr=idx.map(i=>h.ocean_current_velocity[i]),cdir=idx.map(i=>h.ocean_current_direction[i]);
+ const hh=Number(new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Bangkok',hour:'2-digit',hour12:false}).format(now))%24,ni=Math.min(hh,idx.length-1);
+ $('tideDate').textContent=today;$('tideNow').textContent=val(levels[ni],' m',2);$('currentNow').textContent=val(curr[ni],' kt',2);$('currentDirNow').textContent=dir(cdir[ni])+' • TO';
+ const delta=ni>0&&levels[ni]!=null&&levels[ni-1]!=null?levels[ni]-levels[ni-1]:0;$('tideTrend').textContent=Math.abs(delta)<.01?'≈ NEAR SLACK LEVEL':delta>0?'↗ RISING':'↘ FALLING';
+ const ex=localExtrema(levels,times);$('tideExtremes').innerHTML=ex.length?ex.map(x=>`<div class="extreme"><b>${x.type}</b><span>${x.time.slice(11,16)} • ${Number(x.v).toFixed(2)} m</span></div>`).join(''):'<div class="notice">ไม่พบจุดกลับตัวในช่วงวันนี้</div>';
+ $('currentHours').innerHTML=times.map((t,i)=>`<div class="hourChip ${currentClass(curr[i])}"><b>${t.slice(11,16)}</b><strong>${val(curr[i],' kt',2)}</strong><small>${dir(cdir[i])} • TO</small></div>`).join('');drawTide(levels,curr,ni);
+}
+function drawTide(levels,curr,nowIndex){
+ const c=$('tideCanvas'),dpr=window.devicePixelRatio||1,w=c.clientWidth||330,h=c.clientHeight||230;c.width=w*dpr;c.height=h*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);x.clearRect(0,0,w,h);const pad={l:34,r:10,t:16,b:32},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b,valid=levels.filter(Number.isFinite);if(!valid.length)return;let mn=Math.min(...valid),mx=Math.max(...valid);if(mx===mn){mx+=.1;mn-=.1}const X=i=>pad.l+(i/(levels.length-1))*pw,Y=v=>pad.t+(mx-v)/(mx-mn)*ph;
+ x.font='9px system-ui';x.fillStyle='#7fa8bd';x.strokeStyle='#15516f';x.lineWidth=1;for(let k=0;k<4;k++){let yy=pad.t+k*ph/3;x.beginPath();x.moveTo(pad.l,yy);x.lineTo(w-pad.r,yy);x.stroke();let vv=mx-k*(mx-mn)/3;x.fillText(vv.toFixed(2)+'m',1,yy+3)}
+ curr.forEach((v,i)=>{if(v==null)return;const bh=Math.min(ph*.38,(Number(v)/2)*ph*.38);x.fillStyle=Number(v)<.5?'#31e98166':Number(v)<1?'#ffd34f66':Number(v)<1.5?'#ff963866':'#ff4d5f66';x.fillRect(X(i)-pw/levels.length*.28,pad.t+ph-bh,Math.max(2,pw/levels.length*.56),bh)});
+ x.beginPath();levels.forEach((v,i)=>{if(v==null)return;i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v))});x.strokeStyle='#22cfff';x.lineWidth=2.5;x.stroke();
+ if(nowIndex>=0){x.beginPath();x.moveTo(X(nowIndex),pad.t);x.lineTo(X(nowIndex),pad.t+ph);x.strokeStyle='#ffffff88';x.setLineDash([4,4]);x.stroke();x.setLineDash([]);x.fillStyle='#fff';x.fillText('NOW',Math.min(w-30,X(nowIndex)+3),pad.t+10)}
+ [0,6,12,18,23].forEach(i=>{if(i<levels.length){x.fillStyle='#8aafc2';x.fillText(String(i).padStart(2,'0'),X(i)-5,h-10)}})
+}
+const _loadV3=load;load=async function(){await _loadV3();loadTide()};
+window.addEventListener('resize',()=>{if(document.getElementById('tide')?.classList.contains('active'))loadTide()});
+loadTide();

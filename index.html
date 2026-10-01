@@ -49,6 +49,16 @@
  <div id="dayList"></div>
 </section>
 
+
+<section id="tide" class="page">
+ <div class="sectionTitle"><span class="bigIcon">≈</span><div><h2>TIDE & CURRENT</h2><small>24-hour sea level + ocean current</small></div></div>
+ <div class="tideHero"><div class="tideStat"><small>SEA LEVEL NOW</small><strong id="tideNow">--</strong><span id="tideTrend">--</span></div><div class="tideStat"><small>CURRENT NOW</small><strong id="currentNow">--</strong><span id="currentDirNow">--</span></div></div>
+ <div class="chartBox"><div class="chartTitle"><b>24 HOURS</b><small id="tideDate">--</small></div><canvas id="tideCanvas"></canvas><div class="currentLegend"><span><i class="dot low"></i>เบา &lt;0.5 kt</span><span><i class="dot mid"></i>ปานกลาง 0.5–1.0</span><span><i class="dot strong"></i>แรง 1.0–1.5</span><span><i class="dot vstrong"></i>แรงมาก ≥1.5</span></div></div>
+ <h3><span>HIGH / LOW • MODEL</span><small>local extrema</small></h3><div id="tideExtremes" class="extremes"></div>
+ <h3><span>CURRENT • HOURLY</span><small>kt • direction TO</small></h3><div id="currentHours" class="hourStrip"></div>
+ <div class="notice tideWarn">ระดับน้ำและกระแสน้ำเป็นข้อมูลแบบจำลอง Marine ความละเอียดประมาณ 8 กม. ค่า HIGH/LOW ด้านบนหา local extrema จากแบบจำลอง ไม่ใช่ตารางน้ำทางการ และไม่ควรใช้แทนข้อมูลเพื่อการเดินเรือชายฝั่ง</div>
+</section>
+
 <section id="sea" class="page">
  <div class="sectionTitle"><span class="bigIcon">≋</span><div><h2>SEA / WAVE</h2><small>Marine conditions</small></div></div>
  <div id="seaFull" class="cards"></div>
@@ -85,6 +95,7 @@
  <button class="on" data-page="home"><i>⌂</i><span>HOME</span></button>
  <button data-page="weather"><i>☁</i><span>WEATHER</span></button>
  <button data-page="days"><i>▦</i><span>7 DAYS</span></button>
+ <button data-page="tide"><i>≈</i><span>TIDE</span></button>
  <button data-page="sea"><i>≋</i><span>SEA</span></button>
  <button data-page="settings"><i>⚙</i><span>SET</span></button>
 </nav>
