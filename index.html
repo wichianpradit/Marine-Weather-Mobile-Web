@@ -23,18 +23,40 @@
  <button id="reload" class="iconBtn">↻ <span>UPDATE</span></button>
 </div>
 
-<section id="home" class="page active">
- <div class="hero">
-  <div class="weatherHero">
-   <div class="heroIcon">☀</div><span>WEATHER • TMD</span><strong id="temp">--</strong><small id="cond">Current forecast</small>
+<section id="home" class="page active homeV5">
+ <div class="homeHero">
+  <div class="homeBrand"><img src="./tai-pond-logo.png" alt="ไต๋ปอนด์ ปัตตานี"><div class="homeBrandText"><b>MARINE WEATHER</b><small>TAI POND PATTANI</small></div></div>
+  <div class="homeHeroShade"></div>
+  <div class="homeCurrent">
+   <div><small>สภาพอากาศปัจจุบัน</small><strong id="temp">--</strong><span id="cond">TMD</span></div>
+   <div class="homeWind"><small>ลม</small><strong id="homeWind">--</strong><span id="homeWindDir">--</span></div>
   </div>
-  <div class="wave">
-   <div class="heroIcon waveIcon">≋</div><span>WAVE NOW</span><strong id="wave">--</strong><small id="wdir">--</small>
+  <div class="homeUpdate"><i></i><span>อัปเดตล่าสุด</span><b id="homeUpdated">--</b><small>TMD / Open-Meteo</small></div>
+ </div>
+ <div class="homeMetricGrid">
+  <div class="homeMetric waveM"><span>🌊</span><small>ความสูงคลื่น</small><strong id="wave">--</strong><b id="wdir">--</b></div>
+  <div class="homeMetric"><span>💨</span><small>ลม (ผิวน้ำ)</small><strong id="homeWind2">--</strong><b id="homeWindDir2">--</b></div>
+  <div class="homeMetric"><span>↝</span><small>กระแสน้ำ</small><strong id="homeCurrent">--</strong><b id="homeCurrentDir">--</b></div>
+  <div class="homeMetric rainM"><span>🌧</span><small>ปริมาณฝน</small><strong id="homeRain">--</strong><b>ข้อมูล TMD</b></div>
+ </div>
+ <div class="homePanel forecastPanel">
+  <div class="panelHead"><div><span>◷</span><b>ทะเล 6 ชั่วโมงข้างหน้า</b></div><button data-go="days">ดูพยากรณ์ 7 วัน ›</button></div>
+  <div id="home6h" class="home6h"><div class="homeEmpty">กำลังโหลดข้อมูลรายชั่วโมง…</div></div>
+ </div>
+ <div class="quickGrid">
+  <button class="quickCard tripCard" id="planTrip"><span>🎣</span><div><small>วางแผนออกเรือ</small><b>PLAN TRIP</b></div><i>›</i></button>
+  <button class="quickCard spotCard" id="fishingSpots"><span>📍</span><div><small>หมายตกปลา</small><b>FISHING SPOTS</b></div><i>›</i></button>
+ </div>
+ <div class="homePanel seaGlance">
+  <div class="panelHead"><div><span>🌊</span><b>สรุปสภาพทะเลวันนี้</b></div><button data-go="sea">ดูกราฟรายละเอียด ↗</button></div>
+  <div class="glanceGrid">
+   <div><small>น้ำขึ้น-น้ำลง</small><strong id="homeTideTrend">--</strong></div>
+   <div><small>ระดับน้ำ</small><strong id="homeTide">--</strong></div>
+   <div><small>กระแสน้ำ</small><strong id="homeSeaCurrent">--</strong><b id="homeSeaCurrentDir">--</b></div>
+   <div><small>ความสูงคลื่น</small><strong id="homeSeaWave">--</strong><b id="homeSeaPeriod">--</b></div>
   </div>
  </div>
- <div id="cards" class="cards"></div>
- <h3><span>SEA CONDITION</span><small>Marine model</small></h3>
- <div id="seaCards" class="cards"></div>
+ <div id="cards" class="cards homeLegacy"></div><div id="seaCards" class="cards homeLegacy"></div>
 </section>
 
 <section id="weather" class="page">

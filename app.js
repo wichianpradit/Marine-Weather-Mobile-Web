@@ -67,6 +67,14 @@ function render(){
  $("seaFull").innerHTML=dirCard("WAVE HEIGHT / DIRECTION",val(s.wave," m"),s.waveDir,"FROM","cyan")+card("WAVE PERIOD",val(s.period," s"))+dirCard("CURRENT / DIRECTION",val(s.current," kt"),s.currentDir,"TO","cyan")+card("SEA TEMP",val(s.temp,"°C"));
  if($("seaWaveNow")){ $("seaWaveNow").textContent=val(s.wave," m"); $("seaWaveDir").textContent=dir(s.waveDir)+" • FROM"; $("seaWindNow").textContent=val(w.windKn," kt"); $("seaWindDir").textContent=dir(w.windDir)+" • FROM"; }
  renderDays();
+ if($("homeWind")){
+  $("homeWind").textContent=val(w.windKn," kt",0); $("homeWindDir").textContent=dir(w.windDir);
+  $("homeWind2").textContent=val(w.windKn," kt",0); $("homeWindDir2").textContent=dir(w.windDir);
+  $("homeRain").textContent=val(w.rain," mm",1);
+  $("homeCurrent").textContent=val(s.current," kt",1); $("homeCurrentDir").textContent=dir(s.currentDir)+" • TO";
+  $("homeUpdated").textContent=(w.time||new Date().toLocaleString("th-TH"));
+  $("homeSeaWave").textContent=val(s.wave," m",1); $("homeSeaPeriod").textContent="Period "+val(s.period," s",1);
+ }
 }
 function renderDays(){
  const rows=DATA?.days||[];$("dayList").innerHTML=rows.length?rows.map(x=>tab==="wx"
@@ -105,6 +113,13 @@ function renderTide(h){
  $('currentHours').innerHTML=times.map((t,i)=>`<div class="hourChip ${currentClass(curr[i])}"><b>${t.slice(11,16)}</b><strong>${val(curr[i],' kt',2)}</strong><small>${dir(cdir[i])} • TO</small></div>`).join('');
  if($('strengthDots')) $('strengthDots').innerHTML=curr.map(v=>`<i class="${currentClass(v)}"></i>`).join('');
  if($('seaHourly')) { const picks=[9,10,11,12,13,14,15].filter(i=>i<times.length); $('seaHourly').innerHTML=picks.map(i=>`<div class="seaHour ${i===ni?'now':''}"><b>${times[i].slice(11,16)}</b><span>น้ำ ${val(levels[i],' m',2)}</span><strong>กระแส ${val(curr[i],' kt',1)}</strong><small>↗ ${dir(cdir[i])}</small><span>คลื่น ${val(waves[i],' m',1)}</span><small>${val(periods[i],' s',1)} • ${dir(wdirs[i])}</small></div>`).join(''); }
+ if($("homeTide")){
+  $("homeTide").textContent=val(levels[ni]," m",2); $("homeTideTrend").textContent=Math.abs(delta)<.01?"≈ ใกล้ช่วงนิ่ง":delta>0?"↑ กำลังขึ้น":"↓ กำลังลง";
+  $("homeSeaCurrent").textContent=val(curr[ni]," kt",1); $("homeSeaCurrentDir").textContent=dir(cdir[ni])+" • TO";
+  $("homeSeaWave").textContent=val(waves[ni]," m",1); $("homeSeaPeriod").textContent="Period "+val(periods[ni]," s",1);
+  const start=Math.min(ni,times.length-1), picks=Array.from({length:6},(_,k)=>start+k).filter(i=>i<times.length);
+  $("home6h").innerHTML=picks.map(i=>`<div class="h6"><b>${times[i].slice(11,16)}</b><div class="ico">🌊</div><strong>${val(waves[i]," m",1)}</strong><span>กระแส ${val(curr[i]," kt",1)}</span><small>${seaArrow(cdir[i])} ${dir(cdir[i])}</small></div>`).join("");
+ }
  drawTide(levels,curr,waves,ni);
 }
 function drawTide(levels,curr,waves,nowIndex){
@@ -150,3 +165,8 @@ renderTide=function(h){
 // Extend draw function with a selected-hour marker while preserving NOW marker
 const _drawTideV41=drawTide;
 drawTide=function(levels,curr,waves,nowIndex,selectedIndex){_drawTideV41(levels,curr,waves,nowIndex);if(selectedIndex==null)return;const c=$('tideCanvas'),dpr=window.devicePixelRatio||1,w=c.clientWidth||330,h=c.clientHeight||230,x=c.getContext('2d');x.save();x.scale(dpr,dpr);const padL=34,padR=10,padT=16,padB=32,pw=w-padL-padR,ph=h-padT-padB,X=padL+(selectedIndex/(levels.length-1))*pw;x.beginPath();x.moveTo(X,padT);x.lineTo(X,padT+ph);x.strokeStyle='#24d4ff';x.lineWidth=2;x.stroke();x.beginPath();x.arc(X,padT+ph,5,0,Math.PI*2);x.fillStyle='#24d4ff';x.fill();x.font='bold 10px system-ui';x.fillStyle='#24d4ff';x.fillText(String(selectedIndex).padStart(2,'0')+':00',Math.max(2,Math.min(w-40,X-16)),padT+12);x.restore()};
+
+// V5 HOME quick navigation
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.go;const nb=document.querySelector(`nav button[data-page="${p}"]`);nb?.click()}));
+$('planTrip')?.addEventListener('click',()=>toast('PLAN TRIP • เตรียมเปิดใน V5 ขั้นถัดไป'));
+$('fishingSpots')?.addEventListener('click',()=>toast('FISHING SPOTS • เตรียมเปิดใน V5 ขั้นถัดไป'));
